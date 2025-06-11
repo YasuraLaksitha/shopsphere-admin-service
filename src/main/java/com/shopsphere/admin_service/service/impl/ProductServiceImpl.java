@@ -15,6 +15,11 @@ import com.shopsphere.admin_service.service.IFileService;
 import com.shopsphere.admin_service.service.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +36,8 @@ public class ProductServiceImpl implements IProductService {
     private final ObjectMapper objectMapper;
 
     private final IFileService fileService;
+
+    private final CacheManager cacheManager;
 
     @Value("${images.products.url}")
     private String productImageUrl;
@@ -87,6 +94,7 @@ public class ProductServiceImpl implements IProductService {
             productEntity.setUnavailable(true);
 
         productRepository.save(productEntity);
+        updateCache(productEntity.getProductName(), productEntity);
     }
 
     @Override
@@ -100,9 +108,20 @@ public class ProductServiceImpl implements IProductService {
         final String uploadImage = fileService.uploadImage(image, productImageUrl);
         productEntity.setProductImage(createImageUrl(uploadImage));
         productRepository.save(productEntity);
+
+        updateCache(productName, productEntity);
+    }
+
+    private void updateCache(String productName, ProductEntity productEntity) {
+        final Cache cache = cacheManager.getCache("product");
+        if (cache != null) {
+            final ProductDTO dto = objectMapper.convertValue(productEntity, ProductDTO.class);
+            cache.put(productName, dto);
+        }
     }
 
     @Override
+    @CacheEvict(value = "product", key = "#productName")
     public boolean removeProductByName(final String productName) {
         final ProductEntity productEntity =
                 productRepository.findByProductNameStartsWithIgnoreCase(productName).orElseThrow(
@@ -111,6 +130,7 @@ public class ProductServiceImpl implements IProductService {
         if (productEntity.isUnavailable())
             throw new ResourceAlreadyUnavailableException("Product", "product name", productName);
         productEntity.setUnavailable(true);
+        productRepository.save(productEntity);
 
         return productEntity.isUnavailable();
     }
