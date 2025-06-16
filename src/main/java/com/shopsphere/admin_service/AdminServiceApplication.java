@@ -2,12 +2,10 @@ package com.shopsphere.admin_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
-@EnableJpaAuditing(auditorAwareRef = "auditAwareImpl")
-@EnableCaching
+@EnableFeignClients
 public class AdminServiceApplication {
 
 	public static void main(String[] args) {
