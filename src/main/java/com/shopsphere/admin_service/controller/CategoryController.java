@@ -28,8 +28,13 @@ public class CategoryController {
         return categoryFeignClient.updateCategoryDetails(category);
     }
 
-    @DeleteMapping("/admin/{categoryName}/delete")
+    @PutMapping("/admin/{categoryName}/enable")
+    public ResponseEntity<ResponseDTO> enable(@Valid @PathVariable String categoryName) {
+        return categoryFeignClient.enable(categoryName);
+    }
+
+    @PutMapping("/admin/{categoryName}/disable")
     public ResponseEntity<ResponseDTO> updateDetails(@Valid @PathVariable String categoryName) {
-        return categoryFeignClient.delete(categoryName);
+        return categoryFeignClient.disable(categoryName);
     }
 }
