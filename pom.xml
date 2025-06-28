@@ -91,6 +91,7 @@
 
 	<build>
 		<plugins>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -109,7 +110,7 @@
 				<version>3.4.5</version>
 				<configuration>
 					<to>
-						<image>yasuradev/${project.artifactId}:ss-${project.version}-dev</image>
+						<image>yasuradev/${project.artifactId}:ss-${project.version}</image>
 					</to>
 				</configuration>
 			</plugin>
